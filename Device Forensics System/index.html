@@ -1,0 +1,4583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigitalEdge | Device Forensics System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d74da;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+            --gray-color: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 2rem;
+        }
+
+        .login-box {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .login-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .login-header i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .login-body {
+            padding: 2rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .login-btn:hover {
+            background-color: #1e60c9;
+        }
+
+        .login-footer {
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        .login-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Register Page Styles */
+        .register-box {
+            max-width: 500px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Main App Styles (Hidden Initially) */
+        .app-container {
+            display: none;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            height: var(--header-height);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .logo-text span {
+            color: var(--secondary-color);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            display: none;
+            z-index: 101;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-dropdown-item:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+            padding: 2rem 0;
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray-color);
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.85rem 1.5rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #f1f5f9;
+            color: var(--secondary-color);
+            border-left-color: var(--secondary-color);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            margin-left: var(--sidebar-width);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .page-subtitle {
+            color: var(--gray-color);
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1e60c9;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-success {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #0da271;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Dashboard Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-icon.blue {
+            background-color: var(--secondary-color);
+        }
+
+        .stat-icon.green {
+            background-color: var(--accent-color);
+        }
+
+        .stat-icon.orange {
+            background-color: var(--warning-color);
+        }
+
+        .stat-icon.red {
+            background-color: var(--danger-color);
+        }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .stat-info p {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        /* Data Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8fafc;
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-processing {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .device-type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f5f9;
+            color: var(--dark-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .action-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background-color: #f1f5f9;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--gray-color);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Evidence Visualization */
+        .evidence-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .evidence-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .evidence-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .evidence-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .evidence-body {
+            padding: 1.5rem;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2rem;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            border: 3px solid var(--secondary-color);
+        }
+
+        .timeline-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            margin-bottom: 1rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 350px;
+        }
+
+        .toast {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 4px solid var(--secondary-color);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: var(--accent-color);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--accent-color);
+        }
+
+        .toast.warning .toast-icon {
+            color: var(--warning-color);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--danger-color);
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--secondary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Data Visualization */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .data-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        /* User Management */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .user-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .user-avatar-lg {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-role {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* System Settings */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .settings-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        /* Tools */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tool-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-desc {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        /* Tool Execution Panel */
+        .tool-panel {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .tool-panel.active {
+            display: block;
+        }
+
+        .tool-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .tool-panel-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-color);
+            cursor: pointer;
+        }
+
+        .tool-output {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            padding: 1rem;
+            border-radius: 6px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+
+        .tool-progress {
+            margin-top: 1rem;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .filter-panel.active {
+            display: block;
+        }
+
+        /* Export Panel */
+        .export-panel {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .export-panel.active {
+            display: block;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .content {
+                margin-left: 0;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .evidence-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-controls {
+                gap: 1rem;
+            }
+            
+            .user-name {
+                display: none;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-microchip"></i>
+                <h1>DigitalEdge Forensics</h1>
+                <p>Device Forensics Management System</p>
+            </div>
+            <div class="login-body">
+                <form class="login-form" id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="login-btn">Sign In</button>
+                </form>
+            </div>
+            <div class="login-footer">
+                Don't have an account? <a href="#" id="show-register">Register here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page (Hidden Initially) -->
+    <div id="register-page" class="login-container" style="display: none;">
+        <div class="login-box register-box">
+            <div class="login-header">
+                <i class="fas fa-user-plus"></i>
+                <h1>Create Account</h1>
+                <p>Register for DigitalEdge Forensics</p>
+            </div>
+            <div class="login-body">
+                <form class="login-form" id="register-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register-firstname">First Name</label>
+                            <input type="text" id="register-firstname" placeholder="Enter first name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-lastname">Last Name</label>
+                            <input type="text" id="register-lastname" placeholder="Enter last name" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-username">Username</label>
+                        <input type="text" id="register-username" placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email Address</label>
+                        <input type="email" id="register-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" placeholder="Create a password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm">Confirm Password</label>
+                            <input type="password" id="register-confirm" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-role">Role</label>
+                        <select id="register-role" class="form-control" required>
+                            <option value="">Select role</option>
+                            <option value="analyst">Forensic Analyst</option>
+                            <option value="investigator">Investigator</option>
+                            <option value="admin">Administrator</option>
+                            <option value="auditor">Auditor</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="login-btn">Create Account</button>
+                </form>
+            </div>
+            <div class="login-footer">
+                Already have an account? <a href="#" id="show-login">Sign in here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (Hidden Initially) -->
+    <div id="app-container" class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <div class="logo-text">Digital<span>Edge</span></div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="global-search" placeholder="Search cases, devices, evidence...">
+                </div>
+                
+                <div class="user-profile" id="user-profile">
+                    <div class="user-avatar" id="user-avatar">JD</div>
+                    <div class="user-name" id="user-display-name">John Doe</div>
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="#" class="user-dropdown-item" data-page="profile">
+                            <i class="fas fa-user"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="#" class="user-dropdown-item" data-page="settings">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                        <a href="#" class="user-dropdown-item" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <nav class="sidebar">
+                <div class="nav-section">
+                    <div class="nav-title">Main</div>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="cases">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Cases</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="devices">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>Devices</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="evidence">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Evidence</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">Analysis</div>
+                    <a href="#" class="nav-item" data-page="timeline">
+                        <i class="fas fa-stream"></i>
+                        <span>Timeline Analysis</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="reports">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Reports</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="artifacts">
+                        <i class="fas fa-search"></i>
+                        <span>Artifacts</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">Administration</div>
+                    <a href="#" class="nav-item" data-page="users">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="audit">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Audit Log</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>System Settings</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">Tools</div>
+                    <a href="#" class="nav-item" data-page="acquisition">
+                        <i class="fas fa-download"></i>
+                        <span>Data Acquisition</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="decryption">
+                        <i class="fas fa-key"></i>
+                        <span>Decryption Tools</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="carving">
+                        <i class="fas fa-cut"></i>
+                        <span>Data Carving</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="content" id="main-content">
+                <!-- All page content will be loaded here dynamically -->
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing Cases -->
+    <div class="modal-overlay" id="case-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="case-modal-title">Add New Case</h3>
+                <button class="modal-close" onclick="closeModal('case-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="case-form">
+                    <input type="hidden" id="case-id" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="case-name">Case Name *</label>
+                            <input type="text" id="case-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="case-type">Case Type *</label>
+                            <select id="case-type" class="form-control" required>
+                                <option value="">Select type</option>
+                                <option value="cybercrime">Cybercrime</option>
+                                <option value="financial">Financial Fraud</option>
+                                <option value="corporate">Corporate Investigation</option>
+                                <option value="law_enforcement">Law Enforcement</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="case-priority">Priority *</label>
+                            <select id="case-priority" class="form-control" required>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="case-status">Status *</label>
+                            <select id="case-status" class="form-control" required>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="case-description">Description</label>
+                        <textarea id="case-description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="case-device">Associated Device</label>
+                        <select id="case-device" class="form-control">
+                            <option value="">Select device</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('case-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveCase()">Save Case</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing Devices -->
+    <div class="modal-overlay" id="device-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="device-modal-title">Add New Device</h3>
+                <button class="modal-close" onclick="closeModal('device-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="device-form">
+                    <input type="hidden" id="device-id" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="device-type">Device Type *</label>
+                            <select id="device-type" class="form-control" required>
+                                <option value="">Select type</option>
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Desktop">Desktop</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Server">Server</option>
+                                <option value="IoT">IoT Device</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="device-model">Model *</label>
+                            <input type="text" id="device-model" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="device-serial">Serial Number</label>
+                            <input type="text" id="device-serial" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="device-status">Status *</label>
+                            <select id="device-status" class="form-control" required>
+                                <option value="queued">Queued</option>
+                                <option value="acquiring">Acquiring</option>
+                                <option value="analyzing">Analyzing</option>
+                                <option value="analyzed">Analyzed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="device-storage">Storage Size (GB)</label>
+                            <input type="number" id="device-storage" class="form-control" min="1" max="10000">
+                        </div>
+                        <div class="form-group">
+                            <label for="device-os">Operating System</label>
+                            <input type="text" id="device-os" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="device-notes">Notes</label>
+                        <textarea id="device-notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('device-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveDevice()">Save Device</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing Evidence -->
+    <div class="modal-overlay" id="evidence-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="evidence-modal-title">Add New Evidence</h3>
+                <button class="modal-close" onclick="closeModal('evidence-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="evidence-form">
+                    <input type="hidden" id="evidence-id" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="evidence-name">Evidence Name *</label>
+                            <input type="text" id="evidence-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="evidence-type">Evidence Type *</label>
+                            <select id="evidence-type" class="form-control" required>
+                                <option value="">Select type</option>
+                                <option value="Disk Image">Disk Image</option>
+                                <option value="Memory Dump">Memory Dump</option>
+                                <option value="File">File</option>
+                                <option value="Database">Database</option>
+                                <option value="Log File">Log File</option>
+                                <option value="Network Capture">Network Capture</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="evidence-size">Size (GB)</label>
+                            <input type="number" id="evidence-size" class="form-control" step="0.1" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="evidence-status">Status *</label>
+                            <select id="evidence-status" class="form-control" required>
+                                <option value="uploading">Uploading</option>
+                                <option value="processing">Processing</option>
+                                <option value="analyzed">Analyzed</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="evidence-case">Associated Case</label>
+                        <select id="evidence-case" class="form-control">
+                            <option value="">Select case</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="evidence-device">Associated Device</label>
+                        <select id="evidence-device" class="form-control">
+                            <option value="">Select device</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="evidence-notes">Notes</label>
+                        <textarea id="evidence-notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('evidence-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEvidence()">Save Evidence</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding/Editing Users -->
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="user-modal-title">Add New User</h3>
+                <button class="modal-close" onclick="closeModal('user-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="user-form">
+                    <input type="hidden" id="user-id" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-firstname">First Name *</label>
+                            <input type="text" id="user-firstname" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-lastname">Last Name *</label>
+                            <input type="text" id="user-lastname" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-username">Username *</label>
+                            <input type="text" id="user-username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-email">Email *</label>
+                            <input type="email" id="user-email" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-password">Password *</label>
+                            <input type="password" id="user-password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="user-role">Role *</label>
+                            <select id="user-role" class="form-control" required>
+                                <option value="">Select role</option>
+                                <option value="analyst">Forensic Analyst</option>
+                                <option value="investigator">Investigator</option>
+                                <option value="admin">Administrator</option>
+                                <option value="auditor">Auditor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-status">Status *</label>
+                        <select id="user-status" class="form-control" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('user-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveUser()">Save User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel" id="filter-panel">
+        <div class="filter-panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 class="filter-panel-title">Filter Options</h3>
+            <button class="btn btn-sm btn-secondary" onclick="closeFilterPanel()">Close</button>
+        </div>
+        <div id="filter-content">
+            <!-- Filter content will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Export Panel -->
+    <div class="export-panel" id="export-panel">
+        <div class="export-panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 class="export-panel-title">Export Options</h3>
+            <button class="btn btn-sm btn-secondary" onclick="closeExportPanel()">Close</button>
+        </div>
+        <div id="export-content">
+            <!-- Export content will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Tool Execution Panel -->
+    <div class="tool-panel" id="tool-panel">
+        <div class="tool-panel-header">
+            <h3 class="tool-panel-title" id="tool-panel-title">Tool Execution</h3>
+            <button class="tool-panel-close" onclick="closeToolPanel()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="tool-content">
+            <!-- Tool content will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Application State
+        const appState = {
+            currentUser: null,
+            isAuthenticated: false,
+            currentPage: 'dashboard',
+            users: [
+                { id: 1, username: 'admin', password: 'admin123', firstName: 'John', lastName: 'Doe', email: 'john.doe@digitaledge.com', role: 'admin', status: 'active' },
+                { id: 2, username: 'analyst', password: 'analyst123', firstName: 'Sarah', lastName: 'Johnson', email: 'sarah.j@digitaledge.com', role: 'analyst', status: 'active' },
+                { id: 3, username: 'investigator', password: 'invest123', firstName: 'Michael', lastName: 'Chen', email: 'michael.c@digitaledge.com', role: 'investigator', status: 'active' }
+            ],
+            cases: [
+                { id: 1, caseId: 'DF-2023-087', name: 'Corporate Data Breach Investigation', type: 'cybercrime', priority: 'high', status: 'processing', description: 'Investigation into unauthorized access to corporate servers', deviceId: 1, created: '2023-10-15', updated: '2023-11-05', investigator: 'John Doe' },
+                { id: 2, caseId: 'DF-2023-092', name: 'Financial Fraud Analysis', type: 'financial', priority: 'critical', status: 'completed', description: 'Analysis of financial transactions for fraudulent activity', deviceId: 2, created: '2023-10-22', updated: '2023-11-01', investigator: 'Sarah Johnson' },
+                { id: 3, caseId: 'DF-2023-095', name: 'Insider Threat Assessment', type: 'corporate', priority: 'medium', status: 'pending', description: 'Assessment of potential insider threat activities', deviceId: 3, created: '2023-10-28', updated: '2023-10-30', investigator: 'Michael Chen' }
+            ],
+            devices: [
+                { id: 1, deviceId: 'DEV-001', type: 'Smartphone', model: 'iPhone 12 Pro', serial: 'C39TJ5A1LVDT', status: 'analyzed', storage: 256, os: 'iOS 16.4.1', notes: 'Device seized from suspect', caseId: 1 },
+                { id: 2, deviceId: 'DEV-002', type: 'Laptop', model: 'Dell XPS 15', serial: '8VH6T2P9Q1LM', status: 'analyzing', storage: 512, os: 'Windows 11 Pro', notes: 'Corporate laptop suspected of data exfiltration', caseId: 2 },
+                { id: 3, deviceId: 'DEV-003', type: 'Desktop', model: 'Custom Built PC', serial: 'M7N8B4V2C1X9', status: 'queued', storage: 1000, os: 'Linux Ubuntu 22.04', notes: 'Development workstation', caseId: 3 }
+            ],
+            evidence: [
+                { id: 1, evidenceId: 'EVD-001', name: 'iPhone Image Backup', type: 'Disk Image', size: 64.2, status: 'analyzed', caseId: 1, deviceId: 1, notes: 'Full logical image of iPhone 12 Pro' },
+                { id: 2, evidenceId: 'EVD-002', name: 'Email Archive', type: 'File', size: 12.5, status: 'processing', caseId: 2, deviceId: 2, notes: 'PST file containing corporate emails' },
+                { id: 3, evidenceId: 'EVD-003', name: 'Memory Dump', type: 'Memory Dump', size: 8.7, status: 'uploading', caseId: 3, deviceId: 3, notes: 'RAM capture from suspect workstation' }
+            ],
+            auditLogs: [],
+            activeTool: null,
+            activeFilters: {},
+            activeExport: null
+        };
+
+        // Generate unique IDs
+        function generateId(prefix) {
+            return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize authentication
+            initAuthentication();
+            
+            // Initialize toast system
+            initToastSystem();
+            
+            // Initialize navigation
+            initNavigation();
+            
+            // Initialize search functionality
+            initSearch();
+            
+            // Load dashboard as default page
+            loadPage('dashboard');
+        });
+
+        // Authentication System
+        function initAuthentication() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const showRegister = document.getElementById('show-register');
+            const showLogin = document.getElementById('show-login');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            // Login form submission
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('login-username').value;
+                    const password = document.getElementById('login-password').value;
+                    
+                    // Authenticate user
+                    const user = authenticateUser(username, password);
+                    if (user) {
+                        appState.currentUser = user;
+                        appState.isAuthenticated = true;
+                        
+                        // Update UI
+                        document.getElementById('login-page').style.display = 'none';
+                        document.getElementById('app-container').style.display = 'block';
+                        
+                        // Update user info in header
+                        updateUserInfo(user);
+                        
+                        // Show success message
+                        showToast(`Welcome back, ${user.firstName}!`, 'success');
+                        
+                        // Add to audit log
+                        addAuditLog('User logged in', user.username);
+                    } else {
+                        showToast('Invalid username or password', 'error');
+                    }
+                });
+            }
+            
+            // Register form submission
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const firstName = document.getElementById('register-firstname').value;
+                    const lastName = document.getElementById('register-lastname').value;
+                    const username = document.getElementById('register-username').value;
+                    const email = document.getElementById('register-email').value;
+                    const password = document.getElementById('register-password').value;
+                    const confirmPassword = document.getElementById('register-confirm').value;
+                    const role = document.getElementById('register-role').value;
+                    
+                    // Validate passwords match
+                    if (password !== confirmPassword) {
+                        showToast('Passwords do not match', 'error');
+                        return;
+                    }
+                    
+                    // Check if username already exists
+                    if (appState.users.find(u => u.username === username)) {
+                        showToast('Username already exists', 'error');
+                        return;
+                    }
+                    
+                    // Create new user
+                    const newUser = {
+                        id: appState.users.length + 1,
+                        username,
+                        password,
+                        firstName,
+                        lastName,
+                        email,
+                        role,
+                        status: 'active'
+                    };
+                    
+                    appState.users.push(newUser);
+                    
+                    // Switch to login page
+                    document.getElementById('register-page').style.display = 'none';
+                    document.getElementById('login-page').style.display = 'flex';
+                    
+                    // Show success message
+                    showToast('Account created successfully! Please login.', 'success');
+                    
+                    // Clear form
+                    registerForm.reset();
+                    
+                    // Add to audit log
+                    addAuditLog('New user registered', username);
+                });
+            }
+            
+            // Switch to register page
+            if (showRegister) {
+                showRegister.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('register-page').style.display = 'flex';
+                });
+            }
+            
+            // Switch to login page
+            if (showLogin) {
+                showLogin.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('register-page').style.display = 'none';
+                    document.getElementById('login-page').style.display = 'flex';
+                });
+            }
+            
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Add to audit log
+                    addAuditLog('User logged out', appState.currentUser.username);
+                    
+                    // Reset app state
+                    appState.currentUser = null;
+                    appState.isAuthenticated = false;
+                    
+                    // Show login page
+                    document.getElementById('app-container').style.display = 'none';
+                    document.getElementById('login-page').style.display = 'flex';
+                    
+                    // Clear forms
+                    document.getElementById('login-form').reset();
+                    
+                    // Show logout message
+                    showToast('You have been logged out', 'info');
+                });
+            }
+        }
+
+        // Authenticate user
+        function authenticateUser(username, password) {
+            return appState.users.find(user => 
+                user.username === username && user.password === password && user.status === 'active'
+            );
+        }
+
+        // Update user info in header
+        function updateUserInfo(user) {
+            const avatar = document.getElementById('user-avatar');
+            const displayName = document.getElementById('user-display-name');
+            
+            if (avatar) {
+                const initials = `${user.firstName[0]}${user.lastName[0]}`;
+                avatar.textContent = initials;
+            }
+            
+            if (displayName) {
+                displayName.textContent = `${user.firstName} ${user.lastName}`;
+            }
+        }
+
+        // Navigation System
+        function initNavigation() {
+            // Sidebar navigation
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.nav-item')) {
+                    const navItem = e.target.closest('.nav-item');
+                    const page = navItem.getAttribute('data-page');
+                    
+                    // Update active nav item
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    navItem.classList.add('active');
+                    
+                    // Load the page
+                    loadPage(page);
+                }
+                
+                // User dropdown
+                if (e.target.closest('#user-profile')) {
+                    const dropdown = document.getElementById('user-dropdown');
+                    dropdown.classList.toggle('active');
+                } else {
+                    // Close dropdown if clicking outside
+                    const dropdown = document.getElementById('user-dropdown');
+                    if (dropdown && dropdown.classList.contains('active')) {
+                        dropdown.classList.remove('active');
+                    }
+                }
+                
+                // User dropdown items
+                if (e.target.closest('.user-dropdown-item')) {
+                    const dropdownItem = e.target.closest('.user-dropdown-item');
+                    const page = dropdownItem.getAttribute('data-page');
+                    
+                    if (page) {
+                        loadPage(page);
+                    }
+                    
+                    // Close dropdown
+                    document.getElementById('user-dropdown').classList.remove('active');
+                }
+            });
+        }
+
+        // Page Loading System
+        function loadPage(page) {
+            appState.currentPage = page;
+            
+            // Update page title
+            updatePageTitle(page);
+            
+            // Load page content
+            const content = document.getElementById('main-content');
+            content.innerHTML = getPageContent(page);
+            
+            // Initialize page-specific functionality
+            initPageFunctionality(page);
+        }
+
+        // Get page content based on page name
+        function getPageContent(page) {
+            const pageTitles = {
+                dashboard: 'Forensics Dashboard',
+                cases: 'Case Management',
+                devices: 'Device Inventory',
+                evidence: 'Evidence Management',
+                timeline: 'Timeline Analysis',
+                reports: 'Reports',
+                artifacts: 'Artifacts',
+                users: 'User Management',
+                audit: 'Audit Log',
+                settings: 'System Settings',
+                acquisition: 'Data Acquisition',
+                decryption: 'Decryption Tools',
+                carving: 'Data Carving',
+                profile: 'User Profile'
+            };
+            
+            let content = `
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">${pageTitles[page] || page}</h1>
+                        <p class="page-subtitle">${getPageSubtitle(page)}</p>
+                    </div>
+                    <div class="action-buttons">
+                        ${getPageActions(page)}
+                    </div>
+                </div>
+            `;
+            
+            // Add page-specific content
+            content += getPageBody(page);
+            
+            return content;
+        }
+
+        // Get page subtitle
+        function getPageSubtitle(page) {
+            const subtitles = {
+                dashboard: 'Overview of all forensic cases and system status',
+                cases: 'Manage and monitor all forensic cases',
+                devices: 'All seized devices and their status',
+                evidence: 'Digital evidence and chain of custody',
+                timeline: 'Visual timeline of device activities',
+                reports: 'Generate and view forensic reports',
+                artifacts: 'Extracted forensic artifacts and findings',
+                users: 'Manage system users and permissions',
+                audit: 'System activity and access logs',
+                settings: 'Configure system preferences',
+                acquisition: 'Device data acquisition tools',
+                decryption: 'Encryption bypass and decryption tools',
+                carving: 'Data recovery and carving tools',
+                profile: 'Your account information and settings'
+            };
+            
+            return subtitles[page] || 'Manage your forensic investigations';
+        }
+
+        // Get page actions
+        function getPageActions(page) {
+            let actions = '';
+            
+            if (page === 'dashboard') {
+                actions = `
+                    <button class="btn btn-secondary" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="openCaseModal()">
+                        <i class="fas fa-plus"></i> New Case
+                    </button>
+                `;
+            }
+            
+            if (page === 'cases') {
+                actions = `
+                    <button class="btn btn-secondary" onclick="openFilterPanel('cases')">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-secondary" onclick="openExportPanel('cases')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-primary" onclick="openCaseModal()">
+                        <i class="fas fa-plus"></i> Add Case
+                    </button>
+                `;
+            }
+            
+            if (page === 'devices') {
+                actions = `
+                    <button class="btn btn-secondary" onclick="openFilterPanel('devices')">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-secondary" onclick="openExportPanel('devices')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-primary" onclick="openDeviceModal()">
+                        <i class="fas fa-plus"></i> Add Device
+                    </button>
+                `;
+            }
+            
+            if (page === 'evidence') {
+                actions = `
+                    <button class="btn btn-secondary" onclick="openFilterPanel('evidence')">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-secondary" onclick="openExportPanel('evidence')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-primary" onclick="openEvidenceModal()">
+                        <i class="fas fa-plus"></i> Add Evidence
+                    </button>
+                `;
+            }
+            
+            if (page === 'users') {
+                actions = `
+                    <button class="btn btn-secondary" onclick="openFilterPanel('users')">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-secondary" onclick="openExportPanel('users')">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="btn btn-primary" onclick="openUserModal()">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                `;
+            }
+            
+            if (page === 'reports') {
+                actions = `
+                    <button class="btn btn-primary" onclick="generateReport('comprehensive')">
+                        <i class="fas fa-file-pdf"></i> Generate Report
+                    </button>
+                `;
+            }
+            
+            if (page === 'audit') {
+                actions = `
+                    <button class="btn btn-secondary" onclick="openFilterPanel('audit')">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-primary" onclick="exportAuditLog()">
+                        <i class="fas fa-download"></i> Export Log
+                    </button>
+                `;
+            }
+            
+            return actions;
+        }
+
+        // Get page body content
+        function getPageBody(page) {
+            switch(page) {
+                case 'dashboard':
+                    return getDashboardContent();
+                case 'cases':
+                    return getCasesContent();
+                case 'devices':
+                    return getDevicesContent();
+                case 'evidence':
+                    return getEvidenceContent();
+                case 'timeline':
+                    return getTimelineContent();
+                case 'reports':
+                    return getReportsContent();
+                case 'artifacts':
+                    return getArtifactsContent();
+                case 'users':
+                    return getUsersContent();
+                case 'audit':
+                    return getAuditContent();
+                case 'settings':
+                    return getSettingsContent();
+                case 'acquisition':
+                    return getAcquisitionContent();
+                case 'decryption':
+                    return getDecryptionContent();
+                case 'carving':
+                    return getCarvingContent();
+                case 'profile':
+                    return getProfileContent();
+                default:
+                    return '<div class="data-card"><p>Page content will be displayed here.</p></div>';
+            }
+        }
+
+        // Dashboard Content
+        function getDashboardContent() {
+            return `
+                <div class="stats-container">
+                    <div class="stat-card" onclick="loadPage('cases')">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${appState.cases.length}</h3>
+                            <p>Active Cases</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="loadPage('devices')">
+                        <div class="stat-icon green">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${appState.devices.length}</h3>
+                            <p>Devices Processed</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="loadPage('evidence')">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${appState.evidence.reduce((sum, e) => sum + (e.size || 0), 0).toFixed(1)} GB</h3>
+                            <p>Data Analyzed</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="loadPage('audit')">
+                        <div class="stat-icon red">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${appState.auditLogs.filter(log => log.type === 'warning').length}</h3>
+                            <p>System Warnings</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="evidence-container">
+                    <div class="evidence-card">
+                        <div class="evidence-header">
+                            <h3 class="evidence-title">Recent Cases</h3>
+                            <button class="btn btn-secondary btn-sm" onclick="loadPage('cases')">
+                                View All
+                            </button>
+                        </div>
+                        <div class="evidence-body">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Case ID</th>
+                                        <th>Case Name</th>
+                                        <th>Status</th>
+                                        <th>Last Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${appState.cases.slice(0, 5).map(caseItem => `
+                                        <tr>
+                                            <td>${caseItem.caseId}</td>
+                                            <td>${caseItem.name}</td>
+                                            <td><span class="status-badge status-${caseItem.status}">${caseItem.status}</span></td>
+                                            <td>${caseItem.updated}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="evidence-card">
+                        <div class="evidence-header">
+                            <h3 class="evidence-title">System Status</h3>
+                            <span class="status-badge status-completed">All Systems Go</span>
+                        </div>
+                        <div class="evidence-body">
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span>Storage Usage</span>
+                                    <span>65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span>Processing Capacity</span>
+                                    <span>42%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 42%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-info">
+                                    <span>Backup Status</span>
+                                    <span>Up to date</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Cases Content
+        function getCasesContent() {
+            const casesToDisplay = filterItems(appState.cases, appState.activeFilters.cases);
+            
+            return `
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">All Cases (${casesToDisplay.length})</h3>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" id="cases-search" placeholder="Search cases..." onkeyup="searchTable('cases-search', 'cases-table')">
+                        </div>
+                    </div>
+                    <table id="cases-table">
+                        <thead>
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Case Name</th>
+                                <th>Type</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Investigator</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${casesToDisplay.map(caseItem => `
+                                <tr>
+                                    <td>${caseItem.caseId}</td>
+                                    <td>${caseItem.name}</td>
+                                    <td>${caseItem.type}</td>
+                                    <td><span class="status-badge ${getPriorityClass(caseItem.priority)}">${caseItem.priority}</span></td>
+                                    <td><span class="status-badge status-${caseItem.status}">${caseItem.status}</span></td>
+                                    <td>${caseItem.investigator}</td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <button class="action-btn" onclick="viewCaseDetails(${caseItem.id})" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="editCase(${caseItem.id})" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="deleteCase(${caseItem.id})" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="exportCase(${caseItem.id})" title="Export">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Devices Content
+        function getDevicesContent() {
+            const devicesToDisplay = filterItems(appState.devices, appState.activeFilters.devices);
+            
+            return `
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Device Inventory (${devicesToDisplay.length})</h3>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" id="devices-search" placeholder="Search devices..." onkeyup="searchTable('devices-search', 'devices-table')">
+                        </div>
+                    </div>
+                    <table id="devices-table">
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Serial Number</th>
+                                <th>Status</th>
+                                <th>Storage</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${devicesToDisplay.map(device => `
+                                <tr>
+                                    <td>${device.deviceId}</td>
+                                    <td>${device.type}</td>
+                                    <td>${device.model}</td>
+                                    <td>${device.serial}</td>
+                                    <td><span class="status-badge status-${device.status}">${device.status}</span></td>
+                                    <td>${device.storage || 'N/A'} GB</td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <button class="action-btn" onclick="viewDeviceDetails(${device.id})" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="editDevice(${device.id})" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="deleteDevice(${device.id})" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="analyzeDevice(${device.id})" title="Analyze">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Evidence Content
+        function getEvidenceContent() {
+            const evidenceToDisplay = filterItems(appState.evidence, appState.activeFilters.evidence);
+            
+            return `
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Evidence Repository (${evidenceToDisplay.length})</h3>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" id="evidence-search" placeholder="Search evidence..." onkeyup="searchTable('evidence-search', 'evidence-table')">
+                        </div>
+                    </div>
+                    <table id="evidence-table">
+                        <thead>
+                            <tr>
+                                <th>Evidence ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${evidenceToDisplay.map(evidence => `
+                                <tr>
+                                    <td>${evidence.evidenceId}</td>
+                                    <td>${evidence.name}</td>
+                                    <td>${evidence.type}</td>
+                                    <td>${evidence.size || 'N/A'} GB</td>
+                                    <td><span class="status-badge status-${evidence.status}">${evidence.status}</span></td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <button class="action-btn" onclick="viewEvidenceDetails(${evidence.id})" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="editEvidence(${evidence.id})" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="deleteEvidence(${evidence.id})" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            <button class="action-btn" onclick="downloadEvidence(${evidence.id})" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Timeline Analysis Content
+        function getTimelineContent() {
+            return `
+                <div class="evidence-card">
+                    <div class="evidence-header">
+                        <h3 class="evidence-title">Device Activity Timeline</h3>
+                        <button class="btn btn-primary btn-sm" onclick="exportTimeline()">
+                            <i class="fas fa-download"></i> Export Timeline
+                        </button>
+                    </div>
+                    <div class="evidence-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">2023-11-05 14:30:22</div>
+                                    <div class="timeline-title">Device Powered On</div>
+                                    <p>iPhone 12 Pro was powered on. Location data shows device at corporate office.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">2023-11-05 14:35:18</div>
+                                    <div class="timeline-title">Email Application Opened</div>
+                                    <p>User accessed corporate email account. Downloaded attachment "financial_report.pdf".</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">2023-11-05 14:42:05</div>
+                                    <div class="timeline-title">File Transfer via WhatsApp</div>
+                                    <p>Sent document "confidential.docx" to external contact +1-555-123-4567.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">2023-11-05 15:15:33</div>
+                                    <div class="timeline-title">Browser History Cleared</div>
+                                    <p>User cleared Safari browser history and cache files.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">2023-11-05 15:30:12</div>
+                                    <div class="timeline-title">Device Powered Off</div>
+                                    <p>iPhone 12 Pro was powered down. Last known location: parking garage.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Reports Content
+        function getReportsContent() {
+            return `
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="generateReport('case-summary')">
+                        <div class="tool-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="tool-name">Case Summary Report</div>
+                        <div class="tool-desc">Generate comprehensive case summary with findings</div>
+                    </div>
+                    <div class="tool-card" onclick="generateReport('device-analysis')">
+                        <div class="tool-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="tool-name">Device Analysis Report</div>
+                        <div class="tool-desc">Detailed device forensic analysis report</div>
+                    </div>
+                    <div class="tool-card" onclick="generateReport('timeline')">
+                        <div class="tool-icon">
+                            <i class="fas fa-stream"></i>
+                        </div>
+                        <div class="tool-name">Timeline Report</div>
+                        <div class="tool-desc">Chronological timeline of device activities</div>
+                    </div>
+                    <div class="tool-card" onclick="generateReport('artifact-summary')">
+                        <div class="tool-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="tool-name">Artifact Summary</div>
+                        <div class="tool-desc">Summary of extracted forensic artifacts</div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Generated Reports</h3>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" id="reports-search" placeholder="Search reports..." onkeyup="searchTable('reports-search', 'reports-table')">
+                        </div>
+                    </div>
+                    <table id="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Report ID</th>
+                                <th>Report Name</th>
+                                <th>Case ID</th>
+                                <th>Generated By</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>REP-001</td>
+                                <td>Financial Fraud Case Summary</td>
+                                <td>DF-2023-092</td>
+                                <td>John Doe</td>
+                                <td>2023-11-01</td>
+                                <td>
+                                    <div class="action-cell">
+                                        <button class="action-btn" onclick="viewReport('REP-001')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="downloadReport('REP-001')">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="action-btn" onclick="deleteReport('REP-001')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Artifacts Content
+        function getArtifactsContent() {
+            return `
+                <div class="data-grid">
+                    <div class="data-card">
+                        <div class="data-card-title">Browser Artifacts</div>
+                        <p>Extracted browser history, bookmarks, and cache files.</p>
+                        <div class="action-buttons" style="margin-top: 1rem;">
+                            <button class="btn btn-primary btn-sm" onclick="viewArtifacts('browser')">View</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportArtifacts('browser')">Export</button>
+                        </div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-card-title">Email Artifacts</div>
+                        <p>Recovered emails, attachments, and contact lists.</p>
+                        <div class="action-buttons" style="margin-top: 1rem;">
+                            <button class="btn btn-primary btn-sm" onclick="viewArtifacts('email')">View</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportArtifacts('email')">Export</button>
+                        </div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-card-title">Messaging Artifacts</div>
+                        <p>WhatsApp, SMS, and other messaging app data.</p>
+                        <div class="action-buttons" style="margin-top: 1rem;">
+                            <button class="btn btn-primary btn-sm" onclick="viewArtifacts('messaging')">View</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportArtifacts('messaging')">Export</button>
+                        </div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-card-title">File System Artifacts</div>
+                        <p>Deleted files, directory structures, and metadata.</p>
+                        <div class="action-buttons" style="margin-top: 1rem;">
+                            <button class="btn btn-primary btn-sm" onclick="viewArtifacts('filesystem')">View</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportArtifacts('filesystem')">Export</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Users Content
+        function getUsersContent() {
+            const usersToDisplay = filterItems(appState.users, appState.activeFilters.users);
+            
+            return `
+                <div class="user-grid">
+                    ${usersToDisplay.map(user => `
+                        <div class="user-card">
+                            <div class="user-avatar-lg">${user.firstName[0]}${user.lastName[0]}</div>
+                            <div class="user-name">${user.firstName} ${user.lastName}</div>
+                            <div class="user-role">${user.role.toUpperCase()}</div>
+                            <div class="user-status">Status: <span class="status-badge status-${user.status === 'active' ? 'completed' : 'pending'}">${user.status}</span></div>
+                            <div class="action-buttons" style="margin-top: 1rem;">
+                                <button class="btn btn-primary btn-sm" onclick="editUser(${user.id})">Edit</button>
+                                ${user.id !== 1 ? `<button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Audit Log Content
+        function getAuditContent() {
+            // Generate some sample audit logs if empty
+            if (appState.auditLogs.length === 0) {
+                generateSampleAuditLogs();
+            }
+            
+            const logsToDisplay = filterItems(appState.auditLogs, appState.activeFilters.audit);
+            
+            return `
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Audit Log (${logsToDisplay.length} entries)</h3>
+                        <button class="btn btn-secondary" onclick="exportAuditLog()">
+                            <i class="fas fa-download"></i> Export Log
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${logsToDisplay.map(log => `
+                                <tr>
+                                    <td>${log.timestamp}</td>
+                                    <td>${log.user}</td>
+                                    <td>${log.action}</td>
+                                    <td>${log.details}</td>
+                                    <td>${log.ip}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // System Settings Content
+        function getSettingsContent() {
+            return `
+                <div class="settings-grid">
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">General Settings</h3>
+                        <div class="form-group">
+                            <label>System Name</label>
+                            <input type="text" class="form-control" value="DigitalEdge Forensics System">
+                        </div>
+                        <div class="form-group">
+                            <label>Timezone</label>
+                            <select class="form-control">
+                                <option>UTC</option>
+                                <option selected>Local Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date Format</label>
+                            <select class="form-control">
+                                <option>YYYY-MM-DD</option>
+                                <option selected>MM/DD/YYYY</option>
+                                <option>DD/MM/YYYY</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">Save General Settings</button>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3 class="settings-section-title">Security Settings</h3>
+                        <div class="form-group">
+                            <label>Session Timeout (minutes)</label>
+                            <input type="number" class="form-control" value="30" min="5" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label>Password Policy</label>
+                            <select class="form-control">
+                                <option>Standard (8 characters)</option>
+                                <option selected>Strong (12 characters with special characters)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Two-Factor Authentication</label>
+                            <select class="form-control">
+                                <option selected>Disabled</option>
+                                <option>Enabled for Admins</option>
+                                <option>Enabled for All Users</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">Save Security Settings</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Data Acquisition Content
+        function getAcquisitionContent() {
+            return `
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="runAcquisitionTool('logical')">
+                        <div class="tool-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="tool-name">Logical Acquisition</div>
+                        <div class="tool-desc">Extract files and data accessible via normal APIs</div>
+                    </div>
+                    <div class="tool-card" onclick="runAcquisitionTool('physical')">
+                        <div class="tool-icon">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="tool-name">Physical Acquisition</div>
+                        <div class="tool-desc">Bit-by-bit copy of the entire storage device</div>
+                    </div>
+                    <div class="tool-card" onclick="runAcquisitionTool('cloud')">
+                        <div class="tool-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <div class="tool-name">Cloud Acquisition</div>
+                        <div class="tool-desc">Extract data from cloud services and backups</div>
+                    </div>
+                    <div class="tool-card" onclick="runAcquisitionTool('filesystem')">
+                        <div class="tool-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="tool-name">File System Acquisition</div>
+                        <div class="tool-desc">Extract file system metadata and structure</div>
+                    </div>
+                </div>
+                
+                <div class="evidence-card" style="margin-top: 2rem;">
+                    <div class="evidence-header">
+                        <h3 class="evidence-title">Recent Acquisitions</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="refreshAcquisitions()">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="evidence-body">
+                        <div class="progress-container">
+                            <div class="progress-info">
+                                <span>iPhone 12 Pro - Logical Acquisition</span>
+                                <span>78%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-info">
+                                <span>Dell XPS 15 - Physical Acquisition</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Decryption Tools Content
+        function getDecryptionContent() {
+            return `
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="runDecryptionTool('bruteforce')">
+                        <div class="tool-icon">
+                            <i class="fas fa-unlock"></i>
+                        </div>
+                        <div class="tool-name">Brute Force Decryption</div>
+                        <div class="tool-desc">Attempt all possible password combinations</div>
+                    </div>
+                    <div class="tool-card" onclick="runDecryptionTool('dictionary')">
+                        <div class="tool-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="tool-name">Dictionary Attack</div>
+                        <div class="tool-desc">Use word lists to guess passwords</div>
+                    </div>
+                    <div class="tool-card" onclick="runDecryptionTool('rainbow')">
+                        <div class="tool-icon">
+                            <i class="fas fa-rainbow"></i>
+                        </div>
+                        <div class="tool-name">Rainbow Table Attack</div>
+                        <div class="tool-desc">Use precomputed hash tables for faster cracking</div>
+                    </div>
+                    <div class="tool-card" onclick="runDecryptionTool('custom')">
+                        <div class="tool-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="tool-name">Custom Decryption</div>
+                        <div class="tool-desc">Configure custom decryption parameters</div>
+                    </div>
+                </div>
+                
+                <div class="evidence-card" style="margin-top: 2rem;">
+                    <div class="evidence-header">
+                        <h3 class="evidence-title">Decryption Jobs</h3>
+                        <button class="btn btn-primary btn-sm" onclick="createDecryptionJob()">
+                            <i class="fas fa-plus"></i> New Job
+                        </button>
+                    </div>
+                    <div class="evidence-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>Target</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>DEC-001</td>
+                                    <td>encrypted_drive.img</td>
+                                    <td>Brute Force</td>
+                                    <td><span class="status-badge status-processing">Running</span></td>
+                                    <td>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 42%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>DEC-002</td>
+                                    <td>bitlocker_volume</td>
+                                    <td>Dictionary Attack</td>
+                                    <td><span class="status-badge status-completed">Completed</span></td>
+                                    <td>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 100%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Data Carving Content
+        function getCarvingContent() {
+            return `
+                <div class="tools-grid">
+                    <div class="tool-card" onclick="runCarvingTool('file')">
+                        <div class="tool-icon">
+                            <i class="fas fa-file"></i>
+                        </div>
+                        <div class="tool-name">File Carving</div>
+                        <div class="tool-desc">Recover files based on file signatures</div>
+                    </div>
+                    <div class="tool-card" onclick="runCarvingTool('partition')">
+                        <div class="tool-icon">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                        <div class="tool-name">Partition Carving</div>
+                        <div class="tool-desc">Recover deleted partitions and volumes</div>
+                    </div>
+                    <div class="tool-card" onclick="runCarvingTool('database')">
+                        <div class="tool-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="tool-name">Database Carving</div>
+                        <div class="tool-desc">Recover database records and structures</div>
+                    </div>
+                    <div class="tool-card" onclick="runCarvingTool('custom')">
+                        <div class="tool-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="tool-name">Custom Carving</div>
+                        <div class="tool-desc">Define custom patterns for data recovery</div>
+                    </div>
+                </div>
+                
+                <div class="evidence-card" style="margin-top: 2rem;">
+                    <div class="evidence-header">
+                        <h3 class="evidence-title">Carving Results</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="refreshCarvingResults()">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="evidence-body">
+                        <div class="file-list">
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">recovered_image_001.jpg</div>
+                                        <div class="file-meta">Recovered from unallocated space, 2.4 MB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="action-btn" onclick="viewRecoveredFile('image_001')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="downloadRecoveredFile('image_001')">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div>
+                                        <div class="file-name">financial_document.pdf</div>
+                                        <div class="file-meta">Recovered from slack space, 850 KB</div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="action-btn" onclick="viewRecoveredFile('document_pdf')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="downloadRecoveredFile('document_pdf')">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Profile Content
+        function getProfileContent() {
+            if (!appState.currentUser) return '<p>Please login to view profile.</p>';
+            
+            const user = appState.currentUser;
+            return `
+                <div class="evidence-card">
+                    <div class="evidence-header">
+                        <h3 class="evidence-title">User Profile</h3>
+                        <button class="btn btn-primary btn-sm" onclick="editCurrentUser()">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                    </div>
+                    <div class="evidence-body">
+                        <div class="user-avatar-lg" style="margin-bottom: 2rem;">${user.firstName[0]}${user.lastName[0]}</div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <div class="form-control" style="background-color: #f8fafc;">${user.firstName}</div>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <div class="form-control" style="background-color: #f8fafc;">${user.lastName}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Username</label>
+                            <div class="form-control" style="background-color: #f8fafc;">${user.username}</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="form-control" style="background-color: #f8fafc;">${user.email}</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Role</label>
+                            <div class="form-control" style="background-color: #f8fafc; text-transform: uppercase;">${user.role}</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Account Status</label>
+                            <div class="form-control" style="background-color: #f8fafc;">
+                                <span class="status-badge status-${user.status === 'active' ? 'completed' : 'pending'}">${user.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize page-specific functionality
+        function initPageFunctionality(page) {
+            // Initialize any page-specific JS here
+            if (page === 'dashboard') {
+                initDashboard();
+            }
+        }
+
+        // Initialize dashboard
+        function initDashboard() {
+            // Any dashboard-specific initialization
+        }
+
+        // Update page title
+        function updatePageTitle(page) {
+            const pageTitles = {
+                dashboard: 'Forensics Dashboard',
+                cases: 'Case Management',
+                devices: 'Device Inventory',
+                evidence: 'Evidence Management',
+                timeline: 'Timeline Analysis',
+                reports: 'Reports',
+                artifacts: 'Artifacts',
+                users: 'User Management',
+                audit: 'Audit Log',
+                settings: 'System Settings',
+                acquisition: 'Data Acquisition',
+                decryption: 'Decryption Tools',
+                carving: 'Data Carving',
+                profile: 'User Profile'
+            };
+            
+            const titleElement = document.querySelector('.page-title');
+            if (titleElement && pageTitles[page]) {
+                titleElement.textContent = pageTitles[page];
+            }
+        }
+
+        // Get priority class for styling
+        function getPriorityClass(priority) {
+            switch(priority) {
+                case 'critical': return 'status-failed';
+                case 'high': return 'status-processing';
+                case 'medium': return 'status-pending';
+                case 'low': return 'status-completed';
+                default: return 'status-pending';
+            }
+        }
+
+        // Search functionality
+        function initSearch() {
+            const globalSearch = document.getElementById('global-search');
+            if (globalSearch) {
+                globalSearch.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') {
+                        const searchTerm = this.value.toLowerCase();
+                        performGlobalSearch(searchTerm);
+                    }
+                });
+            }
+        }
+
+        // Perform global search
+        function performGlobalSearch(searchTerm) {
+            if (!searchTerm.trim()) return;
+            
+            // Search through cases
+            const caseResults = appState.cases.filter(c => 
+                c.caseId.toLowerCase().includes(searchTerm) || 
+                c.name.toLowerCase().includes(searchTerm) ||
+                c.investigator.toLowerCase().includes(searchTerm)
+            );
+            
+            // Search through devices
+            const deviceResults = appState.devices.filter(d =>
+                d.deviceId.toLowerCase().includes(searchTerm) ||
+                d.model.toLowerCase().includes(searchTerm) ||
+                d.serial.toLowerCase().includes(searchTerm)
+            );
+            
+            // Search through evidence
+            const evidenceResults = appState.evidence.filter(e =>
+                e.evidenceId.toLowerCase().includes(searchTerm) ||
+                e.name.toLowerCase().includes(searchTerm)
+            );
+            
+            // Show search results
+            showSearchResults(caseResults, deviceResults, evidenceResults, searchTerm);
+        }
+
+        // Show search results
+        function showSearchResults(caseResults, deviceResults, evidenceResults, searchTerm) {
+            const resultsCount = caseResults.length + deviceResults.length + evidenceResults.length;
+            
+            let resultsHTML = `
+                <div class="evidence-card">
+                    <div class="evidence-header">
+                        <h3 class="evidence-title">Search Results for "${searchTerm}"</h3>
+                        <span>${resultsCount} results found</span>
+                    </div>
+                    <div class="evidence-body">
+            `;
+            
+            if (caseResults.length > 0) {
+                resultsHTML += `
+                    <h4>Cases (${caseResults.length})</h4>
+                    <ul style="margin-bottom: 1.5rem;">
+                        ${caseResults.map(c => `
+                            <li style="margin-bottom: 0.5rem;">
+                                <a href="#" onclick="loadPage('cases'); highlightSearchResult('${c.caseId}'); return false;" style="color: var(--secondary-color); text-decoration: none;">
+                                    ${c.caseId}: ${c.name}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+            
+            if (deviceResults.length > 0) {
+                resultsHTML += `
+                    <h4>Devices (${deviceResults.length})</h4>
+                    <ul style="margin-bottom: 1.5rem;">
+                        ${deviceResults.map(d => `
+                            <li style="margin-bottom: 0.5rem;">
+                                <a href="#" onclick="loadPage('devices'); highlightSearchResult('${d.deviceId}'); return false;" style="color: var(--secondary-color); text-decoration: none;">
+                                    ${d.deviceId}: ${d.model}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+            
+            if (evidenceResults.length > 0) {
+                resultsHTML += `
+                    <h4>Evidence (${evidenceResults.length})</h4>
+                    <ul>
+                        ${evidenceResults.map(e => `
+                            <li style="margin-bottom: 0.5rem;">
+                                <a href="#" onclick="loadPage('evidence'); highlightSearchResult('${e.evidenceId}'); return false;" style="color: var(--secondary-color); text-decoration: none;">
+                                    ${e.evidenceId}: ${e.name}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+            
+            if (resultsCount === 0) {
+                resultsHTML += `<p>No results found for "${searchTerm}"</p>`;
+            }
+            
+            resultsHTML += `</div></div>`;
+            
+            // Load a temporary page with search results
+            const content = document.getElementById('main-content');
+            content.innerHTML = `
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Search Results</h1>
+                        <p class="page-subtitle">Search results for "${searchTerm}"</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="loadPage('${appState.currentPage}')">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </div>
+                ${resultsHTML}
+            `;
+        }
+
+        // Highlight search result in table
+        function highlightSearchResult(id) {
+            setTimeout(() => {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    if (row.textContent.includes(id)) {
+                        row.style.backgroundColor = '#fff3cd';
+                        setTimeout(() => {
+                            row.style.backgroundColor = '';
+                        }, 3000);
+                    }
+                });
+            }, 500);
+        }
+
+        // Table search function
+        function searchTable(inputId, tableId) {
+            const input = document.getElementById(inputId);
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById(tableId);
+            
+            if (!table) return;
+            
+            const rows = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    const cell = cells[j];
+                    if (cell) {
+                        if (cell.textContent.toLowerCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+
+        // Toast notification system
+        function initToastSystem() {
+            // Toast container already exists in HTML
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            // Set icon based on type
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+                <button class="toast-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add to container
+            toastContainer.appendChild(toast);
+            
+            // Show toast with animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Add close button functionality
+            const closeBtn = toast.querySelector('.toast-close');
+            closeBtn.addEventListener('click', function() {
+                hideToast(toast);
+            });
+            
+            // Auto-remove toast after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    hideToast(toast);
+                }
+            }, 5000);
+        }
+
+        // Hide toast with animation
+        function hideToast(toast) {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+
+        // Add audit log entry
+        function addAuditLog(action, user, details = '', type = 'info') {
+            const logEntry = {
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                user: user,
+                action: action,
+                details: details,
+                type: type,
+                ip: '192.168.1.' + Math.floor(Math.random() * 255)
+            };
+            
+            appState.auditLogs.unshift(logEntry);
+            
+            // Keep only last 100 logs
+            if (appState.auditLogs.length > 100) {
+                appState.auditLogs = appState.auditLogs.slice(0, 100);
+            }
+        }
+
+        // Generate sample audit logs
+        function generateSampleAuditLogs() {
+            const actions = [
+                'User logged in',
+                'Case created',
+                'Device added',
+                'Report generated',
+                'Evidence uploaded',
+                'User permission changed',
+                'System backup completed',
+                'Failed login attempt',
+                'Password changed',
+                'Audit log exported'
+            ];
+            
+            const users = ['admin', 'analyst', 'investigator'];
+            
+            for (let i = 0; i < 15; i++) {
+                const daysAgo = Math.floor(Math.random() * 30);
+                const date = new Date();
+                date.setDate(date.getDate() - daysAgo);
+                
+                const logEntry = {
+                    timestamp: date.toISOString().replace('T', ' ').substring(0, 19),
+                    user: users[Math.floor(Math.random() * users.length)],
+                    action: actions[Math.floor(Math.random() * actions.length)],
+                    details: 'Sample audit log entry',
+                    type: Math.random() > 0.8 ? 'warning' : 'info',
+                    ip: '192.168.1.' + Math.floor(Math.random() * 255)
+                };
+                
+                appState.auditLogs.push(logEntry);
+            }
+            
+            // Sort by timestamp (newest first)
+            appState.auditLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                // Reset form
+                const form = modal.querySelector('form');
+                if (form) form.reset();
+            }
+        }
+
+        // Case Modal Functions
+        function openCaseModal(caseId = null) {
+            const modal = document.getElementById('case-modal');
+            const title = document.getElementById('case-modal-title');
+            const form = document.getElementById('case-form');
+            
+            if (caseId) {
+                // Edit existing case
+                title.textContent = 'Edit Case';
+                const caseItem = appState.cases.find(c => c.id === caseId);
+                if (caseItem) {
+                    document.getElementById('case-id').value = caseItem.id;
+                    document.getElementById('case-name').value = caseItem.name;
+                    document.getElementById('case-type').value = caseItem.type;
+                    document.getElementById('case-priority').value = caseItem.priority;
+                    document.getElementById('case-status').value = caseItem.status;
+                    document.getElementById('case-description').value = caseItem.description || '';
+                    document.getElementById('case-device').value = caseItem.deviceId || '';
+                }
+            } else {
+                // Add new case
+                title.textContent = 'Add New Case';
+                form.reset();
+                document.getElementById('case-id').value = '';
+                // Generate new case ID
+                const nextId = appState.cases.length > 0 ? Math.max(...appState.cases.map(c => parseInt(c.caseId.split('-').pop()))) + 1 : 101;
+                document.getElementById('case-name').placeholder = `Case DF-2023-${nextId}`;
+            }
+            
+            // Populate device dropdown
+            const deviceSelect = document.getElementById('case-device');
+            deviceSelect.innerHTML = '<option value="">Select device</option>';
+            appState.devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                option.textContent = `${device.deviceId}: ${device.model}`;
+                deviceSelect.appendChild(option);
+            });
+            
+            openModal('case-modal');
+        }
+
+        function saveCase() {
+            const form = document.getElementById('case-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const caseId = document.getElementById('case-id').value;
+            const caseName = document.getElementById('case-name').value;
+            const caseType = document.getElementById('case-type').value;
+            const priority = document.getElementById('case-priority').value;
+            const status = document.getElementById('case-status').value;
+            const description = document.getElementById('case-description').value;
+            const deviceId = document.getElementById('case-device').value;
+            
+            if (caseId) {
+                // Update existing case
+                const index = appState.cases.findIndex(c => c.id == caseId);
+                if (index !== -1) {
+                    appState.cases[index].name = caseName;
+                    appState.cases[index].type = caseType;
+                    appState.cases[index].priority = priority;
+                    appState.cases[index].status = status;
+                    appState.cases[index].description = description;
+                    appState.cases[index].deviceId = deviceId;
+                    appState.cases[index].updated = new Date().toISOString().split('T')[0];
+                    
+                    showToast('Case updated successfully', 'success');
+                    addAuditLog('Case updated', appState.currentUser.username, `Case ${appState.cases[index].caseId} was updated`);
+                }
+            } else {
+                // Add new case
+                const newCaseId = `DF-2023-${appState.cases.length + 101}`;
+                const newCase = {
+                    id: appState.cases.length + 1,
+                    caseId: newCaseId,
+                    name: caseName,
+                    type: caseType,
+                    priority: priority,
+                    status: status,
+                    description: description,
+                    deviceId: deviceId,
+                    investigator: appState.currentUser.firstName + ' ' + appState.currentUser.lastName,
+                    created: new Date().toISOString().split('T')[0],
+                    updated: new Date().toISOString().split('T')[0]
+                };
+                
+                appState.cases.push(newCase);
+                showToast(`Case ${newCaseId} created successfully`, 'success');
+                addAuditLog('Case created', appState.currentUser.username, `Case ${newCaseId} was created`);
+            }
+            
+            closeModal('case-modal');
+            loadPage('cases');
+        }
+
+        // Device Modal Functions
+        function openDeviceModal(deviceId = null) {
+            const modal = document.getElementById('device-modal');
+            const title = document.getElementById('device-modal-title');
+            const form = document.getElementById('device-form');
+            
+            if (deviceId) {
+                // Edit existing device
+                title.textContent = 'Edit Device';
+                const device = appState.devices.find(d => d.id === deviceId);
+                if (device) {
+                    document.getElementById('device-id').value = device.id;
+                    document.getElementById('device-type').value = device.type;
+                    document.getElementById('device-model').value = device.model;
+                    document.getElementById('device-serial').value = device.serial;
+                    document.getElementById('device-status').value = device.status;
+                    document.getElementById('device-storage').value = device.storage || '';
+                    document.getElementById('device-os').value = device.os || '';
+                    document.getElementById('device-notes').value = device.notes || '';
+                }
+            } else {
+                // Add new device
+                title.textContent = 'Add New Device';
+                form.reset();
+                document.getElementById('device-id').value = '';
+                // Generate new device ID
+                const nextId = appState.devices.length > 0 ? Math.max(...appState.devices.map(d => parseInt(d.deviceId.split('-').pop()))) + 1 : 1;
+                document.getElementById('device-model').placeholder = `Device DEV-${String(nextId).padStart(3, '0')}`;
+            }
+            
+            openModal('device-modal');
+        }
+
+        function saveDevice() {
+            const form = document.getElementById('device-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const deviceId = document.getElementById('device-id').value;
+            const deviceType = document.getElementById('device-type').value;
+            const model = document.getElementById('device-model').value;
+            const serial = document.getElementById('device-serial').value;
+            const status = document.getElementById('device-status').value;
+            const storage = document.getElementById('device-storage').value;
+            const os = document.getElementById('device-os').value;
+            const notes = document.getElementById('device-notes').value;
+            
+            if (deviceId) {
+                // Update existing device
+                const index = appState.devices.findIndex(d => d.id == deviceId);
+                if (index !== -1) {
+                    appState.devices[index].type = deviceType;
+                    appState.devices[index].model = model;
+                    appState.devices[index].serial = serial;
+                    appState.devices[index].status = status;
+                    appState.devices[index].storage = storage ? parseInt(storage) : null;
+                    appState.devices[index].os = os;
+                    appState.devices[index].notes = notes;
+                    
+                    showToast('Device updated successfully', 'success');
+                    addAuditLog('Device updated', appState.currentUser.username, `Device ${appState.devices[index].deviceId} was updated`);
+                }
+            } else {
+                // Add new device
+                const newDeviceId = `DEV-${String(appState.devices.length + 1).padStart(3, '0')}`;
+                const newDevice = {
+                    id: appState.devices.length + 1,
+                    deviceId: newDeviceId,
+                    type: deviceType,
+                    model: model,
+                    serial: serial,
+                    status: status,
+                    storage: storage ? parseInt(storage) : null,
+                    os: os,
+                    notes: notes
+                };
+                
+                appState.devices.push(newDevice);
+                showToast(`Device ${newDeviceId} added successfully`, 'success');
+                addAuditLog('Device added', appState.currentUser.username, `Device ${newDeviceId} was added`);
+            }
+            
+            closeModal('device-modal');
+            loadPage('devices');
+        }
+
+        // Evidence Modal Functions
+        function openEvidenceModal(evidenceId = null) {
+            const modal = document.getElementById('evidence-modal');
+            const title = document.getElementById('evidence-modal-title');
+            const form = document.getElementById('evidence-form');
+            
+            if (evidenceId) {
+                // Edit existing evidence
+                title.textContent = 'Edit Evidence';
+                const evidence = appState.evidence.find(e => e.id === evidenceId);
+                if (evidence) {
+                    document.getElementById('evidence-id').value = evidence.id;
+                    document.getElementById('evidence-name').value = evidence.name;
+                    document.getElementById('evidence-type').value = evidence.type;
+                    document.getElementById('evidence-size').value = evidence.size || '';
+                    document.getElementById('evidence-status').value = evidence.status;
+                    document.getElementById('evidence-case').value = evidence.caseId || '';
+                    document.getElementById('evidence-device').value = evidence.deviceId || '';
+                    document.getElementById('evidence-notes').value = evidence.notes || '';
+                }
+            } else {
+                // Add new evidence
+                title.textContent = 'Add New Evidence';
+                form.reset();
+                document.getElementById('evidence-id').value = '';
+                // Generate new evidence ID
+                const nextId = appState.evidence.length > 0 ? Math.max(...appState.evidence.map(e => parseInt(e.evidenceId.split('-').pop()))) + 1 : 1;
+                document.getElementById('evidence-name').placeholder = `Evidence EVD-${String(nextId).padStart(3, '0')}`;
+            }
+            
+            // Populate case dropdown
+            const caseSelect = document.getElementById('evidence-case');
+            caseSelect.innerHTML = '<option value="">Select case</option>';
+            appState.cases.forEach(caseItem => {
+                const option = document.createElement('option');
+                option.value = caseItem.id;
+                option.textContent = `${caseItem.caseId}: ${caseItem.name}`;
+                caseSelect.appendChild(option);
+            });
+            
+            // Populate device dropdown
+            const deviceSelect = document.getElementById('evidence-device');
+            deviceSelect.innerHTML = '<option value="">Select device</option>';
+            appState.devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.id;
+                option.textContent = `${device.deviceId}: ${device.model}`;
+                deviceSelect.appendChild(option);
+            });
+            
+            openModal('evidence-modal');
+        }
+
+        function saveEvidence() {
+            const form = document.getElementById('evidence-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const evidenceId = document.getElementById('evidence-id').value;
+            const name = document.getElementById('evidence-name').value;
+            const type = document.getElementById('evidence-type').value;
+            const size = document.getElementById('evidence-size').value;
+            const status = document.getElementById('evidence-status').value;
+            const caseId = document.getElementById('evidence-case').value;
+            const deviceId = document.getElementById('evidence-device').value;
+            const notes = document.getElementById('evidence-notes').value;
+            
+            if (evidenceId) {
+                // Update existing evidence
+                const index = appState.evidence.findIndex(e => e.id == evidenceId);
+                if (index !== -1) {
+                    appState.evidence[index].name = name;
+                    appState.evidence[index].type = type;
+                    appState.evidence[index].size = size ? parseFloat(size) : null;
+                    appState.evidence[index].status = status;
+                    appState.evidence[index].caseId = caseId;
+                    appState.evidence[index].deviceId = deviceId;
+                    appState.evidence[index].notes = notes;
+                    
+                    showToast('Evidence updated successfully', 'success');
+                    addAuditLog('Evidence updated', appState.currentUser.username, `Evidence ${appState.evidence[index].evidenceId} was updated`);
+                }
+            } else {
+                // Add new evidence
+                const newEvidenceId = `EVD-${String(appState.evidence.length + 1).padStart(3, '0')}`;
+                const newEvidence = {
+                    id: appState.evidence.length + 1,
+                    evidenceId: newEvidenceId,
+                    name: name,
+                    type: type,
+                    size: size ? parseFloat(size) : null,
+                    status: status,
+                    caseId: caseId,
+                    deviceId: deviceId,
+                    notes: notes
+                };
+                
+                appState.evidence.push(newEvidence);
+                showToast(`Evidence ${newEvidenceId} added successfully`, 'success');
+                addAuditLog('Evidence added', appState.currentUser.username, `Evidence ${newEvidenceId} was added`);
+            }
+            
+            closeModal('evidence-modal');
+            loadPage('evidence');
+        }
+
+        // User Modal Functions
+        function openUserModal(userId = null) {
+            const modal = document.getElementById('user-modal');
+            const title = document.getElementById('user-modal-title');
+            const form = document.getElementById('user-form');
+            
+            if (userId) {
+                // Edit existing user
+                title.textContent = 'Edit User';
+                const user = appState.users.find(u => u.id === userId);
+                if (user) {
+                    document.getElementById('user-id').value = user.id;
+                    document.getElementById('user-firstname').value = user.firstName;
+                    document.getElementById('user-lastname').value = user.lastName;
+                    document.getElementById('user-username').value = user.username;
+                    document.getElementById('user-email').value = user.email;
+                    document.getElementById('user-role').value = user.role;
+                    document.getElementById('user-status').value = user.status;
+                    // Don't show password when editing
+                    document.getElementById('user-password').required = false;
+                }
+            } else {
+                // Add new user
+                title.textContent = 'Add New User';
+                form.reset();
+                document.getElementById('user-id').value = '';
+                document.getElementById('user-password').required = true;
+            }
+            
+            openModal('user-modal');
+        }
+
+        function saveUser() {
+            const form = document.getElementById('user-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const userId = document.getElementById('user-id').value;
+            const firstName = document.getElementById('user-firstname').value;
+            const lastName = document.getElementById('user-lastname').value;
+            const username = document.getElementById('user-username').value;
+            const email = document.getElementById('user-email').value;
+            const password = document.getElementById('user-password').value;
+            const role = document.getElementById('user-role').value;
+            const status = document.getElementById('user-status').value;
+            
+            if (userId) {
+                // Update existing user
+                const index = appState.users.findIndex(u => u.id == userId);
+                if (index !== -1) {
+                    // Check if username is being changed and if it already exists
+                    if (appState.users[index].username !== username && appState.users.find(u => u.username === username && u.id != userId)) {
+                        showToast('Username already exists', 'error');
+                        return;
+                    }
+                    
+                    appState.users[index].firstName = firstName;
+                    appState.users[index].lastName = lastName;
+                    appState.users[index].username = username;
+                    appState.users[index].email = email;
+                    if (password) {
+                        appState.users[index].password = password;
+                    }
+                    appState.users[index].role = role;
+                    appState.users[index].status = status;
+                    
+                    showToast('User updated successfully', 'success');
+                    addAuditLog('User updated', appState.currentUser.username, `User ${username} was updated`);
+                }
+            } else {
+                // Add new user
+                // Check if username already exists
+                if (appState.users.find(u => u.username === username)) {
+                    showToast('Username already exists', 'error');
+                    return;
+                }
+                
+                const newUser = {
+                    id: appState.users.length + 1,
+                    username: username,
+                    password: password,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    role: role,
+                    status: status
+                };
+                
+                appState.users.push(newUser);
+                showToast(`User ${username} added successfully`, 'success');
+                addAuditLog('User added', appState.currentUser.username, `User ${username} was added`);
+            }
+            
+            closeModal('user-modal');
+            loadPage('users');
+        }
+
+        // Filter Panel Functions
+        function openFilterPanel(type) {
+            const panel = document.getElementById('filter-panel');
+            const content = document.getElementById('filter-content');
+            
+            let filterHTML = '';
+            
+            switch(type) {
+                case 'cases':
+                    filterHTML = `
+                        <h4>Filter Cases</h4>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" id="filter-case-status" onchange="applyFilter('cases', 'status', this.value)">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select class="form-control" id="filter-case-priority" onchange="applyFilter('cases', 'priority', this.value)">
+                                <option value="">All Priorities</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Case Type</label>
+                            <select class="form-control" id="filter-case-type" onchange="applyFilter('cases', 'type', this.value)">
+                                <option value="">All Types</option>
+                                <option value="cybercrime">Cybercrime</option>
+                                <option value="financial">Financial Fraud</option>
+                                <option value="corporate">Corporate Investigation</option>
+                                <option value="law_enforcement">Law Enforcement</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearFilters('cases')">Clear Filters</button>
+                    `;
+                    break;
+                    
+                case 'devices':
+                    filterHTML = `
+                        <h4>Filter Devices</h4>
+                        <div class="form-group">
+                            <label>Device Type</label>
+                            <select class="form-control" id="filter-device-type" onchange="applyFilter('devices', 'type', this.value)">
+                                <option value="">All Types</option>
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Desktop">Desktop</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Server">Server</option>
+                                <option value="IoT">IoT Device</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" id="filter-device-status" onchange="applyFilter('devices', 'status', this.value)">
+                                <option value="">All Statuses</option>
+                                <option value="queued">Queued</option>
+                                <option value="acquiring">Acquiring</option>
+                                <option value="analyzing">Analyzing</option>
+                                <option value="analyzed">Analyzed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearFilters('devices')">Clear Filters</button>
+                    `;
+                    break;
+                    
+                case 'evidence':
+                    filterHTML = `
+                        <h4>Filter Evidence</h4>
+                        <div class="form-group">
+                            <label>Evidence Type</label>
+                            <select class="form-control" id="filter-evidence-type" onchange="applyFilter('evidence', 'type', this.value)">
+                                <option value="">All Types</option>
+                                <option value="Disk Image">Disk Image</option>
+                                <option value="Memory Dump">Memory Dump</option>
+                                <option value="File">File</option>
+                                <option value="Database">Database</option>
+                                <option value="Log File">Log File</option>
+                                <option value="Network Capture">Network Capture</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" id="filter-evidence-status" onchange="applyFilter('evidence', 'status', this.value)">
+                                <option value="">All Statuses</option>
+                                <option value="uploading">Uploading</option>
+                                <option value="processing">Processing</option>
+                                <option value="analyzed">Analyzed</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearFilters('evidence')">Clear Filters</button>
+                    `;
+                    break;
+                    
+                case 'users':
+                    filterHTML = `
+                        <h4>Filter Users</h4>
+                        <div class="form-group">
+                            <label>Role</label>
+                            <select class="form-control" id="filter-user-role" onchange="applyFilter('users', 'role', this.value)">
+                                <option value="">All Roles</option>
+                                <option value="analyst">Forensic Analyst</option>
+                                <option value="investigator">Investigator</option>
+                                <option value="admin">Administrator</option>
+                                <option value="auditor">Auditor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select class="form-control" id="filter-user-status" onchange="applyFilter('users', 'status', this.value)">
+                                <option value="">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearFilters('users')">Clear Filters</button>
+                    `;
+                    break;
+                    
+                case 'audit':
+                    filterHTML = `
+                        <h4>Filter Audit Log</h4>
+                        <div class="form-group">
+                            <label>User</label>
+                            <select class="form-control" id="filter-audit-user" onchange="applyFilter('audit', 'user', this.value)">
+                                <option value="">All Users</option>
+                                ${[...new Set(appState.auditLogs.map(log => log.user))].map(user => `
+                                    <option value="${user}">${user}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Action Type</label>
+                            <select class="form-control" id="filter-audit-type" onchange="applyFilter('audit', 'type', this.value)">
+                                <option value="">All Types</option>
+                                <option value="info">Information</option>
+                                <option value="warning">Warning</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearFilters('audit')">Clear Filters</button>
+                    `;
+                    break;
+            }
+            
+            content.innerHTML = filterHTML;
+            panel.classList.add('active');
+        }
+
+        function closeFilterPanel() {
+            const panel = document.getElementById('filter-panel');
+            panel.classList.remove('active');
+        }
+
+        function applyFilter(type, field, value) {
+            if (!appState.activeFilters[type]) {
+                appState.activeFilters[type] = {};
+            }
+            
+            if (value === '') {
+                delete appState.activeFilters[type][field];
+            } else {
+                appState.activeFilters[type][field] = value;
+            }
+            
+            // Reload the current page to apply filters
+            loadPage(appState.currentPage);
+        }
+
+        function clearFilters(type) {
+            if (appState.activeFilters[type]) {
+                delete appState.activeFilters[type];
+            }
+            closeFilterPanel();
+            loadPage(appState.currentPage);
+        }
+
+        function filterItems(items, filters) {
+            if (!filters || Object.keys(filters).length === 0) {
+                return items;
+            }
+            
+            return items.filter(item => {
+                for (const [field, value] of Object.entries(filters)) {
+                    if (item[field] !== value) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        // Export Panel Functions
+        function openExportPanel(type) {
+            const panel = document.getElementById('export-panel');
+            const content = document.getElementById('export-content');
+            
+            let exportHTML = '';
+            
+            switch(type) {
+                case 'cases':
+                    exportHTML = `
+                        <h4>Export Cases</h4>
+                        <div class="form-group">
+                            <label>Export Format</label>
+                            <select class="form-control" id="export-format">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Include Fields</label>
+                            <div>
+                                <label style="display: block;"><input type="checkbox" checked> Case ID</label>
+                                <label style="display: block;"><input type="checkbox" checked> Case Name</label>
+                                <label style="display: block;"><input type="checkbox" checked> Type</label>
+                                <label style="display: block;"><input type="checkbox" checked> Priority</label>
+                                <label style="display: block;"><input type="checkbox" checked> Status</label>
+                                <label style="display: block;"><input type="checkbox"> Description</label>
+                                <label style="display: block;"><input type="checkbox" checked> Investigator</label>
+                                <label style="display: block;"><input type="checkbox" checked> Created Date</label>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportData('cases')">Export Now</button>
+                    `;
+                    break;
+                    
+                case 'devices':
+                    exportHTML = `
+                        <h4>Export Devices</h4>
+                        <div class="form-group">
+                            <label>Export Format</label>
+                            <select class="form-control" id="export-format">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportData('devices')">Export Now</button>
+                    `;
+                    break;
+                    
+                case 'evidence':
+                    exportHTML = `
+                        <h4>Export Evidence</h4>
+                        <div class="form-group">
+                            <label>Export Format</label>
+                            <select class="form-control" id="export-format">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                                <option value="pdf">PDF</option>
+                                <option value="excel">Excel</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportData('evidence')">Export Now</button>
+                    `;
+                    break;
+                    
+                case 'users':
+                    exportHTML = `
+                        <h4>Export Users</h4>
+                        <div class="form-group">
+                            <label>Export Format</label>
+                            <select class="form-control" id="export-format">
+                                <option value="csv">CSV</option>
+                                <option value="json">JSON</option>
+                                <option value="pdf">PDF</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportData('users')">Export Now</button>
+                    `;
+                    break;
+            }
+            
+            content.innerHTML = exportHTML;
+            panel.classList.add('active');
+        }
+
+        function closeExportPanel() {
+            const panel = document.getElementById('export-panel');
+            panel.classList.remove('active');
+        }
+
+        function exportData(type) {
+            const format = document.getElementById('export-format').value;
+            let data = [];
+            
+            switch(type) {
+                case 'cases':
+                    data = appState.cases;
+                    break;
+                case 'devices':
+                    data = appState.devices;
+                    break;
+                case 'evidence':
+                    data = appState.evidence;
+                    break;
+                case 'users':
+                    data = appState.users;
+                    break;
+            }
+            
+            // Simulate export
+            showToast(`Exporting ${type} as ${format.toUpperCase()}...`, 'info');
+            
+            setTimeout(() => {
+                showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} exported successfully as ${format.toUpperCase()}`, 'success');
+                closeExportPanel();
+                addAuditLog(`${type.charAt(0).toUpperCase() + type.slice(1)} exported`, appState.currentUser.username, `Exported as ${format.toUpperCase()}`);
+            }, 1500);
+        }
+
+        // Tool Panel Functions
+        function openToolPanel(toolName, toolType) {
+            const panel = document.getElementById('tool-panel');
+            const title = document.getElementById('tool-panel-title');
+            const content = document.getElementById('tool-content');
+            
+            appState.activeTool = { name: toolName, type: toolType };
+            title.textContent = `Running: ${toolName}`;
+            
+            let toolHTML = '';
+            
+            switch(toolType) {
+                case 'acquisition':
+                    toolHTML = `
+                        <div class="form-group">
+                            <label>Target Device</label>
+                            <select class="form-control" id="tool-device">
+                                ${appState.devices.map(device => `
+                                    <option value="${device.id}">${device.deviceId}: ${device.model}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Acquisition Method</label>
+                            <select class="form-control" id="tool-method">
+                                <option value="logical">Logical Acquisition</option>
+                                <option value="physical">Physical Acquisition</option>
+                                <option value="targeted">Targeted Acquisition</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Output Format</label>
+                            <select class="form-control" id="tool-output-format">
+                                <option value="dd">RAW (DD Image)</option>
+                                <option value="e01">EWF (E01)</option>
+                                <option value="aff">AFF</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeTool()">Start Acquisition</button>
+                        <div class="tool-output" id="tool-output"></div>
+                    `;
+                    break;
+                    
+                case 'decryption':
+                    toolHTML = `
+                        <div class="form-group">
+                            <label>Encrypted File/Device</label>
+                            <input type="text" class="form-control" id="tool-target" placeholder="Enter path to encrypted file">
+                        </div>
+                        <div class="form-group">
+                            <label>Decryption Method</label>
+                            <select class="form-control" id="tool-method">
+                                <option value="bruteforce">Brute Force</option>
+                                <option value="dictionary">Dictionary Attack</option>
+                                <option value="rainbow">Rainbow Table</option>
+                                <option value="custom">Custom Parameters</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="custom-params" style="display: none;">
+                            <label>Custom Parameters</label>
+                            <textarea class="form-control" id="tool-params" rows="3" placeholder="Enter custom decryption parameters"></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeTool()">Start Decryption</button>
+                        <div class="tool-output" id="tool-output"></div>
+                    `;
+                    break;
+                    
+                case 'carving':
+                    toolHTML = `
+                        <div class="form-group">
+                            <label>Source Image/Device</label>
+                            <select class="form-control" id="tool-source">
+                                ${appState.evidence.filter(e => e.type === 'Disk Image').map(evidence => `
+                                    <option value="${evidence.id}">${evidence.evidenceId}: ${evidence.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Carving Method</label>
+                            <select class="form-control" id="tool-method">
+                                <option value="file">File Carving</option>
+                                <option value="partition">Partition Carving</option>
+                                <option value="database">Database Carving</option>
+                                <option value="custom">Custom Pattern</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>File Types to Recover</label>
+                            <select class="form-control" id="tool-filetypes" multiple>
+                                <option value="jpg">JPEG Images</option>
+                                <option value="pdf">PDF Documents</option>
+                                <option value="doc">Word Documents</option>
+                                <option value="xls">Excel Files</option>
+                                <option value="zip">ZIP Archives</option>
+                                <option value="db">Database Files</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="executeTool()">Start Carving</button>
+                        <div class="tool-output" id="tool-output"></div>
+                    `;
+                    break;
+            }
+            
+            content.innerHTML = toolHTML;
+            panel.classList.add('active');
+        }
+
+        function closeToolPanel() {
+            const panel = document.getElementById('tool-panel');
+            panel.classList.remove('active');
+            appState.activeTool = null;
+        }
+
+        function executeTool() {
+            const output = document.getElementById('tool-output');
+            output.innerHTML = 'Starting tool execution...\n\n';
+            
+            // Simulate tool execution with progress
+            simulateToolExecution(output);
+        }
+
+        function simulateToolExecution(output) {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                
+                if (progress <= 100) {
+                    output.innerHTML += `Processing... ${progress}% complete\n`;
+                    output.scrollTop = output.scrollHeight;
+                    
+                    if (progress === 100) {
+                        output.innerHTML += '\nTool execution completed successfully!\n';
+                        output.innerHTML += 'Results saved to database.\n';
+                        clearInterval(interval);
+                        
+                        // Add to audit log
+                        addAuditLog('Tool executed', appState.currentUser.username, `${appState.activeTool.name} tool completed`);
+                    }
+                }
+            }, 200);
+        }
+
+        // Action functions
+        function refreshDashboard() {
+            showToast('Dashboard refreshed', 'success');
+            loadPage('dashboard');
+        }
+
+        function viewCaseDetails(caseId) {
+            const caseItem = appState.cases.find(c => c.id === caseId);
+            if (caseItem) {
+                alert(`Case Details:\n\nID: ${caseItem.caseId}\nName: ${caseItem.name}\nType: ${caseItem.type}\nPriority: ${caseItem.priority}\nStatus: ${caseItem.status}\nInvestigator: ${caseItem.investigator}\nDescription: ${caseItem.description || 'No description'}`);
+            }
+        }
+
+        function editCase(caseId) {
+            openCaseModal(caseId);
+        }
+
+        function deleteCase(caseId) {
+            const caseItem = appState.cases.find(c => c.id === caseId);
+            if (caseItem && confirm(`Are you sure you want to delete case "${caseItem.name}"?`)) {
+                appState.cases = appState.cases.filter(c => c.id !== caseId);
+                showToast(`Case ${caseItem.caseId} deleted`, 'success');
+                addAuditLog('Case deleted', appState.currentUser.username, `Case ${caseItem.caseId} was deleted`);
+                loadPage('cases');
+            }
+        }
+
+        function exportCase(caseId) {
+            const caseItem = appState.cases.find(c => c.id === caseId);
+            if (caseItem) {
+                showToast(`Exporting case ${caseItem.caseId}...`, 'info');
+                setTimeout(() => {
+                    showToast(`Case ${caseItem.caseId} exported successfully`, 'success');
+                }, 1500);
+            }
+        }
+
+        function viewDeviceDetails(deviceId) {
+            const device = appState.devices.find(d => d.id === deviceId);
+            if (device) {
+                alert(`Device Details:\n\nID: ${device.deviceId}\nType: ${device.type}\nModel: ${device.model}\nSerial: ${device.serial}\nStatus: ${device.status}\nStorage: ${device.storage || 'N/A'} GB\nOS: ${device.os || 'Unknown'}\nNotes: ${device.notes || 'No notes'}`);
+            }
+        }
+
+        function editDevice(deviceId) {
+            openDeviceModal(deviceId);
+        }
+
+        function deleteDevice(deviceId) {
+            const device = appState.devices.find(d => d.id === deviceId);
+            if (device && confirm(`Are you sure you want to delete device "${device.model}"?`)) {
+                appState.devices = appState.devices.filter(d => d.id !== deviceId);
+                showToast(`Device ${device.deviceId} deleted`, 'success');
+                addAuditLog('Device deleted', appState.currentUser.username, `Device ${device.deviceId} was deleted`);
+                loadPage('devices');
+            }
+        }
+
+        function analyzeDevice(deviceId) {
+            const device = appState.devices.find(d => d.id === deviceId);
+            if (device) {
+                showToast(`Starting analysis of ${device.deviceId}...`, 'info');
+                // Simulate analysis
+                setTimeout(() => {
+                    device.status = 'analyzed';
+                    showToast(`Analysis of ${device.deviceId} completed`, 'success');
+                    addAuditLog('Device analyzed', appState.currentUser.username, `Device ${device.deviceId} analysis completed`);
+                    loadPage('devices');
+                }, 2000);
+            }
+        }
+
+        function viewEvidenceDetails(evidenceId) {
+            const evidence = appState.evidence.find(e => e.id === evidenceId);
+            if (evidence) {
+                alert(`Evidence Details:\n\nID: ${evidence.evidenceId}\nName: ${evidence.name}\nType: ${evidence.type}\nSize: ${evidence.size || 'N/A'} GB\nStatus: ${evidence.status}\nNotes: ${evidence.notes || 'No notes'}`);
+            }
+        }
+
+        function editEvidence(evidenceId) {
+            openEvidenceModal(evidenceId);
+        }
+
+        function deleteEvidence(evidenceId) {
+            const evidence = appState.evidence.find(e => e.id === evidenceId);
+            if (evidence && confirm(`Are you sure you want to delete evidence "${evidence.name}"?`)) {
+                appState.evidence = appState.evidence.filter(e => e.id !== evidenceId);
+                showToast(`Evidence ${evidence.evidenceId} deleted`, 'success');
+                addAuditLog('Evidence deleted', appState.currentUser.username, `Evidence ${evidence.evidenceId} was deleted`);
+                loadPage('evidence');
+            }
+        }
+
+        function downloadEvidence(evidenceId) {
+            const evidence = appState.evidence.find(e => e.id === evidenceId);
+            if (evidence) {
+                showToast(`Downloading ${evidence.evidenceId}...`, 'info');
+                setTimeout(() => {
+                    showToast(`Evidence ${evidence.evidenceId} downloaded successfully`, 'success');
+                }, 1500);
+            }
+        }
+
+        function exportTimeline() {
+            showToast('Exporting timeline...', 'info');
+            setTimeout(() => {
+                showToast('Timeline exported successfully as PDF', 'success');
+            }, 1500);
+        }
+
+        function generateReport(type) {
+            const reportNames = {
+                'case-summary': 'Case Summary Report',
+                'device-analysis': 'Device Analysis Report',
+                'timeline': 'Timeline Report',
+                'artifact-summary': 'Artifact Summary Report',
+                'comprehensive': 'Comprehensive Forensic Report'
+            };
+            
+            showToast(`Generating ${reportNames[type]}...`, 'info');
+            setTimeout(() => {
+                showToast(`${reportNames[type]} generated successfully`, 'success');
+                addAuditLog('Report generated', appState.currentUser.username, `${reportNames[type]} was generated`);
+            }, 2000);
+        }
+
+        function viewReport(reportId) {
+            alert(`Viewing report ${reportId}`);
+        }
+
+        function downloadReport(reportId) {
+            showToast(`Downloading report ${reportId}...`, 'info');
+            setTimeout(() => {
+                showToast(`Report ${reportId} downloaded successfully`, 'success');
+            }, 1500);
+        }
+
+        function deleteReport(reportId) {
+            if (confirm(`Are you sure you want to delete report ${reportId}?`)) {
+                showToast(`Report ${reportId} deleted`, 'success');
+            }
+        }
+
+        function viewArtifacts(type) {
+            alert(`Viewing ${type} artifacts`);
+        }
+
+        function exportArtifacts(type) {
+            showToast(`Exporting ${type} artifacts...`, 'info');
+            setTimeout(() => {
+                showToast(`${type} artifacts exported successfully`, 'success');
+            }, 1500);
+        }
+
+        function editUser(userId) {
+            openUserModal(userId);
+        }
+
+        function deleteUser(userId) {
+            const user = appState.users.find(u => u.id === userId);
+            if (user && user.id !== 1 && confirm(`Are you sure you want to delete user "${user.username}"?`)) {
+                appState.users = appState.users.filter(u => u.id !== userId);
+                showToast(`User ${user.username} deleted`, 'success');
+                addAuditLog('User deleted', appState.currentUser.username, `User ${user.username} was deleted`);
+                loadPage('users');
+            }
+        }
+
+        function editCurrentUser() {
+            if (appState.currentUser) {
+                openUserModal(appState.currentUser.id);
+            }
+        }
+
+        function exportAuditLog() {
+            showToast('Exporting audit log...', 'info');
+            setTimeout(() => {
+                showToast('Audit log exported successfully as CSV', 'success');
+                addAuditLog('Audit log exported', appState.currentUser.username, 'Audit log was exported');
+            }, 1500);
+        }
+
+        function saveSettings() {
+            showToast('General settings saved successfully', 'success');
+        }
+
+        function saveSecuritySettings() {
+            showToast('Security settings saved successfully', 'success');
+        }
+
+        function runAcquisitionTool(type) {
+            const toolNames = {
+                'logical': 'Logical Acquisition',
+                'physical': 'Physical Acquisition',
+                'cloud': 'Cloud Acquisition',
+                'filesystem': 'File System Acquisition'
+            };
+            
+            openToolPanel(toolNames[type], 'acquisition');
+        }
+
+        function runDecryptionTool(type) {
+            const toolNames = {
+                'bruteforce': 'Brute Force Decryption',
+                'dictionary': 'Dictionary Attack',
+                'rainbow': 'Rainbow Table Attack',
+                'custom': 'Custom Decryption'
+            };
+            
+            openToolPanel(toolNames[type], 'decryption');
+        }
+
+        function createDecryptionJob() {
+            openToolPanel('New Decryption Job', 'decryption');
+        }
+
+        function runCarvingTool(type) {
+            const toolNames = {
+                'file': 'File Carving',
+                'partition': 'Partition Carving',
+                'database': 'Database Carving',
+                'custom': 'Custom Carving'
+            };
+            
+            openToolPanel(toolNames[type], 'carving');
+        }
+
+        function refreshAcquisitions() {
+            showToast('Acquisition list refreshed', 'success');
+        }
+
+        function refreshCarvingResults() {
+            showToast('Carving results refreshed', 'success');
+        }
+
+        function viewRecoveredFile(fileId) {
+            alert(`Viewing recovered file: ${fileId}`);
+        }
+
+        function downloadRecoveredFile(fileId) {
+            showToast(`Downloading ${fileId}...`, 'info');
+            setTimeout(() => {
+                showToast(`${fileId} downloaded successfully`, 'success');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
